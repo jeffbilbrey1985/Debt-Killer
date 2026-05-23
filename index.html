@@ -20,6 +20,7 @@
     --accent-glow: rgba(255, 59, 59, 0.35);
     --success: #2ecc71;
     --success-bg: rgba(46, 204, 113, 0.12);
+    --success-glow: rgba(46, 204, 113, 0.45);
     --warning: #f5a623;
     --danger: #ff3b3b;
     --info: #4a9eff;
@@ -39,7 +40,7 @@
       radial-gradient(circle at 85% 90%, rgba(74, 158, 255, 0.05), transparent 40%),
       var(--bg-0);
   }
-  .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+  .container { max-width: 1500px; margin: 0 auto; padding: 24px; }
   header { text-align: center; margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
   .brand {
     display: inline-block;
@@ -60,7 +61,7 @@
     text-transform: uppercase;
     text-shadow: 0 2px 12px rgba(255, 59, 59, 0.3);
   }
-  .tagline { color: var(--text-dim); font-size: 14px; max-width: 720px; margin: 0 auto; line-height: 1.6; }
+  .tagline { color: var(--text-dim); font-size: 14px; max-width: 760px; margin: 0 auto; line-height: 1.6; }
 
   /* Mission Status */
   .mission-status {
@@ -104,6 +105,14 @@
     color: var(--text-dim);
     margin-top: 4px;
   }
+  .kpi .mini-bar {
+    height: 4px; background: var(--bg-3); border-radius: 2px; margin-top: 8px; overflow: hidden;
+  }
+  .kpi .mini-fill {
+    height: 100%; background: var(--accent); transition: width 0.4s;
+  }
+  .kpi.win .mini-fill { background: var(--success); }
+  .kpi.gold .mini-fill { background: var(--gold); }
 
   /* Progress Bar */
   .total-progress {
@@ -186,6 +195,7 @@
     flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 20px;
+    align-items: center;
   }
   .btn {
     background: var(--bg-2);
@@ -221,6 +231,8 @@
   }
   .btn.danger:hover { background: var(--accent); color: #000; }
   .btn.tiny { padding: 4px 8px; font-size: 10px; letter-spacing: 1px; }
+  .btn.chev { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 4px 8px; }
+  .btn.chev.open { background: var(--bg-3); color: var(--text); border-color: var(--accent); }
 
   /* Save status */
   .save-indicator {
@@ -251,7 +263,7 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 1200px;
+    min-width: 1300px;
   }
   thead {
     background: var(--bg-2);
@@ -279,11 +291,15 @@
     box-shadow: inset 4px 0 0 var(--accent);
   }
   tr.dead {
-    opacity: 0.45;
+    opacity: 0.55;
     background: var(--success-bg);
   }
   tr.dead td:first-child {
     box-shadow: inset 4px 0 0 var(--success);
+  }
+  tr.expanded-row td {
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
   }
   .rank {
     font-family: 'Impact', sans-serif;
@@ -306,6 +322,19 @@
   .badge.target-badge { background: var(--accent); color: #000; }
   .badge.dead-badge { background: var(--success); color: #000; }
   .badge.queue { background: var(--bg-3); color: var(--text-dim); border: 1px solid var(--border-bright); }
+  .util-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--bg-3);
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .util-pill.low { background: rgba(46, 204, 113, 0.15); color: var(--success); }
+  .util-pill.med { background: rgba(245, 166, 35, 0.15); color: var(--warning); }
+  .util-pill.high { background: rgba(255, 59, 59, 0.15); color: var(--accent); }
 
   /* Inline edit inputs */
   .cell-input {
@@ -330,6 +359,23 @@
   .cell-input.name { min-width: 140px; font-weight: 600; }
   select.cell-input { cursor: pointer; }
 
+  /* Flash animation on balance drop */
+  @keyframes flashGreen {
+    0%   { background: rgba(46, 204, 113, 0.55); box-shadow: 0 0 24px var(--success-glow); }
+    100% { background: transparent; box-shadow: none; }
+  }
+  .cell-flash {
+    animation: flashGreen 1.6s ease-out;
+  }
+  @keyframes shakeIn {
+    0%   { transform: translateX(0); }
+    25%  { transform: translateX(-3px); }
+    50%  { transform: translateX(3px); }
+    75%  { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
+  }
+  .shake { animation: shakeIn 0.4s ease-out; }
+
   /* Progress bar inside row */
   .row-progress {
     width: 110px;
@@ -342,7 +388,7 @@
   .row-progress-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--accent), var(--accent-bright));
-    transition: width 0.3s;
+    transition: width 0.4s;
   }
   tr.dead .row-progress-fill { background: var(--success); }
   .row-progress-label {
@@ -351,6 +397,108 @@
     margin-top: 4px;
     display: block;
   }
+
+  /* Expanded detail */
+  .expanded-detail {
+    padding: 18px 24px;
+    border-left: 4px solid var(--accent);
+    background: var(--bg-1);
+    border-radius: 0 6px 6px 0;
+  }
+  .expanded-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+  }
+  .detail-section h4 {
+    margin: 0 0 12px 0;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .field-pair {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+  .field-pair label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .field-pair input, .field-pair select {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  .field-pair input:focus { outline: none; border-color: var(--accent); }
+
+  /* Payment ledger */
+  .pay-form {
+    display: grid;
+    grid-template-columns: 130px 130px 1fr auto;
+    gap: 8px;
+    align-items: end;
+    margin-bottom: 14px;
+    padding: 12px;
+    background: var(--bg-2);
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  .pay-form .field { gap: 4px; }
+  .pay-form input {
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  .pay-list { max-height: 280px; overflow-y: auto; }
+  .pay-row {
+    display: grid;
+    grid-template-columns: 100px 120px 1fr auto auto;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .pay-row:hover { background: var(--bg-3); }
+  .pay-row .date { color: var(--text-dim); font-size: 12px; }
+  .pay-row .amount { font-weight: 700; color: var(--success); font-variant-numeric: tabular-nums; text-align: right; }
+  .pay-row .note { color: var(--text-dim); font-style: italic; }
+  .pay-row input.edit-input {
+    background: var(--bg-0);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    padding: 4px 6px;
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 12px;
+    width: 100%;
+  }
+  .pay-empty { color: var(--text-muted); font-style: italic; padding: 16px; text-align: center; }
+  .pay-totals {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    background: var(--bg-3);
+    border-radius: 4px;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+  .pay-totals .num { font-family: 'Impact', sans-serif; font-size: 18px; color: var(--success); letter-spacing: 1px; }
 
   /* Add Debt Section */
   .add-section {
@@ -446,6 +594,7 @@
     transform: translateY(20px);
     transition: all 0.3s;
     pointer-events: none;
+    max-width: 360px;
   }
   .toast.show {
     opacity: 1;
@@ -462,9 +611,13 @@
     margin-top: 24px;
   }
 
-  @media (max-width: 720px) {
+  @media (max-width: 900px) {
     h1 { font-size: 32px; }
     .container { padding: 14px; }
+    .expanded-grid { grid-template-columns: 1fr; }
+    .pay-form { grid-template-columns: 1fr 1fr; }
+    .pay-row { grid-template-columns: 90px 1fr auto; }
+    .pay-row .note { display: none; }
   }
 </style>
 </head>
@@ -475,8 +628,8 @@
   <div class="brand">DEBT KILL MODE</div>
   <h1>Debt Pay-Off Target Planner</h1>
   <p class="tagline">
-    Lock in your numbers. Auto-saved 24/7. Add, edit, or kill any debt at will. The table auto-sorts by urgency,
-    your snowball rolls forward as accounts die, and your data lives in your browser until you say otherwise.
+    Lock in numbers. Log every payment. Watch your balance and credit utilization drop in real time.
+    Click any row to open its payment ledger, set its credit limit, and edit the history.
   </p>
 </header>
 
@@ -498,11 +651,18 @@
   <div class="kpi urgent">
     <div class="label">Current Debt</div>
     <div class="value" id="kpiCurrent">$0</div>
+    <div class="sub" id="kpiPaidTotal">$0 paid</div>
   </div>
   <div class="kpi info">
     <div class="label">Monthly Obligation</div>
     <div class="value" id="kpiMonthly">$0</div>
     <div class="sub">Minimums only</div>
+  </div>
+  <div class="kpi gold">
+    <div class="label">CC Utilization</div>
+    <div class="value" id="kpiUtil">—</div>
+    <div class="sub" id="kpiUtilSub">Set credit limits below</div>
+    <div class="mini-bar"><div class="mini-fill" id="kpiUtilBar" style="width: 0%;"></div></div>
   </div>
   <div class="kpi gold">
     <div class="label">Snowball Fuel</div>
@@ -567,16 +727,18 @@
   <table>
     <thead>
       <tr>
+        <th style="width:30px;"></th>
         <th class="rank">#</th>
         <th>Status</th>
         <th>Account Name</th>
         <th>Type</th>
         <th style="text-align:right;">Original</th>
-        <th style="text-align:right;">Current Balance</th>
+        <th style="text-align:right;">Current</th>
+        <th style="text-align:right;">Limit</th>
+        <th style="text-align:right;">Util</th>
         <th style="text-align:right;">APR %</th>
         <th style="text-align:right;">Min Pay</th>
         <th style="text-align:right;">Auto Attack</th>
-        <th style="text-align:right;">One-Time Hit</th>
         <th>Progress</th>
         <th>Est. Payoff</th>
         <th></th>
@@ -588,7 +750,7 @@
   </table>
 </div>
 
-<!-- ADD DEBT (also has dedicated button above) -->
+<!-- ADD DEBT -->
 <section class="add-section" id="quickAdd" style="display:none;">
   <h3>Add New Debt</h3>
   <div class="add-grid">
@@ -611,6 +773,10 @@
     <div class="field">
       <label>Current Balance</label>
       <input type="number" id="newBalance" min="0" step="0.01" placeholder="0">
+    </div>
+    <div class="field">
+      <label>Credit Limit (CC only)</label>
+      <input type="number" id="newLimit" min="0" step="0.01" placeholder="0">
     </div>
     <div class="field">
       <label>APR %</label>
@@ -641,16 +807,17 @@
   <div class="rules">
     <ul>
       <li>The top row of the table is the account the planner wants you to kill next.</li>
-      <li>Your monthly attack payment <strong>snowballs automatically</strong> as debts get wiped out — paid-off minimums become fuel for the next account instead of disappearing into lifestyle creep.</li>
-      <li>Switch strategies if needed: <em>Avalanche</em> saves the most interest, <em>Snowball</em> gives you faster psychological wins.</li>
-      <li>Everything you type is auto-saved to your browser. Export a JSON backup any time you make a major change so you can restore it on any device.</li>
-      <li>Edit any field inline — name, type, balance, APR, minimum. No backend lock.</li>
+      <li><strong>Click the ▸ chevron</strong> on any row to open its payment ledger, set credit limit, and see/edit your payment history.</li>
+      <li>When you log a payment, the balance drops in real time — the cell flashes green so you actually see it move.</li>
+      <li>Your monthly attack <strong>snowballs automatically</strong> as debts get wiped out — paid-off minimums become fuel for the next account.</li>
+      <li>Switch strategies: <em>Avalanche</em> saves the most interest, <em>Snowball</em> gives you faster psychological wins.</li>
+      <li>Everything auto-saves to your browser. <strong>Click ⬇ Export</strong> after any big change to keep a JSON backup.</li>
     </ul>
   </div>
 </section>
 
 <footer>
-  Built for Jeff · Data lives in your browser localStorage · v1.0
+  Built for Jeff · Data lives in your browser localStorage · v2.0 · Payment ledger + utilization tracking
 </footer>
 
 </div>
@@ -659,10 +826,11 @@
 
 <script>
 /* =========================================================
-   Debt Kill Mode Planner — single-file standalone app
+   Debt Kill Mode Planner v2 — single-file standalone app
+   Schema is backward-compatible with v1 saved data.
    ========================================================= */
 
-const STORAGE_KEY = 'debtKillerData_v1';
+const STORAGE_KEY = 'debtKillerData_v1';   // SAME key as v1 — preserves your data
 
 const DEFAULT_STATE = {
   debts: [],
@@ -670,11 +838,13 @@ const DEFAULT_STATE = {
   strategy: 'avalanche',
   startDate: new Date().toISOString().slice(0, 10),
   rowFilter: 'all',
-  victoryLog: []
+  victoryLog: [],
+  expanded: {}   // { debtId: true } — which rows are open
 };
 
 let state = loadState();
 let saveTimer = null;
+let lastBalances = {}; // for flash animation
 
 /* ----------------- Persistence ----------------- */
 function loadState() {
@@ -682,7 +852,22 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return structuredClone(DEFAULT_STATE);
     const parsed = JSON.parse(raw);
-    return { ...structuredClone(DEFAULT_STATE), ...parsed };
+    const merged = { ...structuredClone(DEFAULT_STATE), ...parsed };
+    // Migrate each debt to include new v2 fields without losing v1 data
+    merged.debts = (merged.debts || []).map(d => ({
+      id: d.id || uid(),
+      name: d.name || '',
+      type: d.type || 'Credit Card',
+      original: Number(d.original) || Number(d.balance) || 0,
+      balance: Number(d.balance) || 0,
+      apr: Number(d.apr) || 0,
+      min: Number(d.min) || 0,
+      oneTime: Number(d.oneTime) || 0,
+      creditLimit: Number(d.creditLimit) || 0,          // NEW v2
+      payments: Array.isArray(d.payments) ? d.payments : [], // NEW v2
+      order: typeof d.order === 'number' ? d.order : 0
+    }));
+    return merged;
   } catch (e) {
     console.warn('Failed to load state, using default', e);
     return structuredClone(DEFAULT_STATE);
@@ -690,7 +875,6 @@ function loadState() {
 }
 
 function saveState() {
-  // Show "saving" briefly, then "saved"
   const dot = document.getElementById('saveDot');
   const txt = document.getElementById('saveText');
   if (dot && txt) {
@@ -724,8 +908,11 @@ function toast(msg, type = '') {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.className = 'toast show ' + type;
-  setTimeout(() => el.classList.remove('show'), 2400);
+  setTimeout(() => el.classList.remove('show'), 2800);
 }
+
+function isCC(d) { return (d.type || '').toLowerCase().includes('credit'); }
+function todayISO() { return new Date().toISOString().slice(0, 10); }
 
 /* ----------------- Ranking ----------------- */
 function rankedDebts() {
@@ -738,32 +925,26 @@ function rankedDebts() {
   } else if (state.strategy === 'snowball') {
     ranked = [...active].sort((a, b) => (Number(a.balance) || 0) - (Number(b.balance) || 0));
   } else {
-    // custom: respect order field, fallback to insertion order
     ranked = [...active].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
   }
   return { ranked, dead };
 }
 
-/* ----------------- Math: simulate payoff ----------------- */
+/* ----------------- Simulation ----------------- */
 function simulate() {
-  // Clone debts so we don't mutate state
   const debts = state.debts.map(d => ({
-    id: d.id,
-    name: d.name,
+    id: d.id, name: d.name,
     balance: Number(d.balance) || 0,
     apr: Number(d.apr) || 0,
-    min: Number(d.min) || 0,
-    original: Number(d.original) || Number(d.balance) || 0
+    min: Number(d.min) || 0
   }));
   const extra = Number(state.extraAttack) || 0;
-
   let totalInterest = 0;
   let months = 0;
-  const MAX_MONTHS = 1200; // 100 years bail-out
+  const MAX_MONTHS = 1200;
 
   while (debts.some(d => d.balance > 0) && months < MAX_MONTHS) {
     months++;
-    // 1. Accrue interest
     debts.forEach(d => {
       if (d.balance > 0) {
         const interest = d.balance * (d.apr / 100 / 12);
@@ -771,80 +952,7 @@ function simulate() {
         totalInterest += interest;
       }
     });
-    // 2. Determine ranking among active
     const active = debts.filter(d => d.balance > 0);
-    let target;
-    if (state.strategy === 'avalanche') {
-      active.sort((a, b) => b.apr - a.apr);
-    } else if (state.strategy === 'snowball') {
-      active.sort((a, b) => a.balance - b.balance);
-    } else {
-      // custom: use the same order as state
-      const orderMap = new Map(state.debts.map((d, i) => [d.id, d.order ?? i]));
-      active.sort((a, b) => (orderMap.get(a.id) ?? 999) - (orderMap.get(b.id) ?? 999));
-    }
-    target = active[0];
-
-    // 3. Compute available cash this month
-    //    = sum of minimums on active debts + extra attack + freed minimums (= already 0 because dead debts have balance 0)
-    const totalMins = active.reduce((s, d) => s + d.min, 0);
-    const freedFuel = debts.filter(d => d.balance <= 0).reduce((s, d) => s + d.min, 0);
-    let available = totalMins + extra + freedFuel;
-
-    // 4. Pay minimums on non-target active debts first
-    for (const d of active) {
-      if (d.id === target.id) continue;
-      const pay = Math.min(d.min, d.balance);
-      d.balance -= pay;
-      available -= pay;
-    }
-    // 5. Hammer target with all remaining cash
-    const pay = Math.min(available, target.balance);
-    target.balance -= pay;
-    available -= pay;
-    if (target.balance < 0.005) target.balance = 0;
-
-    // 6. If there's still leftover (target died mid-month), cascade
-    while (available > 0.01) {
-      const nextActive = debts.filter(d => d.balance > 0);
-      if (!nextActive.length) break;
-      if (state.strategy === 'avalanche') nextActive.sort((a, b) => b.apr - a.apr);
-      else if (state.strategy === 'snowball') nextActive.sort((a, b) => a.balance - b.balance);
-      else {
-        const orderMap = new Map(state.debts.map((d, i) => [d.id, d.order ?? i]));
-        nextActive.sort((a, b) => (orderMap.get(a.id) ?? 999) - (orderMap.get(b.id) ?? 999));
-      }
-      const t2 = nextActive[0];
-      const p2 = Math.min(available, t2.balance);
-      t2.balance -= p2;
-      available -= p2;
-      if (t2.balance < 0.005) t2.balance = 0;
-    }
-  }
-
-  return { months, totalInterest, success: debts.every(d => d.balance <= 0) };
-}
-
-function estimatePerDebt() {
-  // Per-debt projected payoff month (in calendar offset from startDate)
-  const debts = state.debts.map(d => ({
-    id: d.id,
-    name: d.name,
-    balance: Number(d.balance) || 0,
-    apr: Number(d.apr) || 0,
-    min: Number(d.min) || 0
-  }));
-  const extra = Number(state.extraAttack) || 0;
-  const payoffMonth = {};
-  const MAX_MONTHS = 1200;
-  let months = 0;
-  while (debts.some(d => d.balance > 0) && months < MAX_MONTHS) {
-    months++;
-    debts.forEach(d => {
-      if (d.balance > 0) d.balance += d.balance * (d.apr / 100 / 12);
-    });
-    const active = debts.filter(d => d.balance > 0);
-    let order;
     if (state.strategy === 'avalanche') active.sort((a, b) => b.apr - a.apr);
     else if (state.strategy === 'snowball') active.sort((a, b) => a.balance - b.balance);
     else {
@@ -852,6 +960,7 @@ function estimatePerDebt() {
       active.sort((a, b) => (orderMap.get(a.id) ?? 999) - (orderMap.get(b.id) ?? 999));
     }
     const target = active[0];
+    if (!target) break;
     const totalMins = active.reduce((s, d) => s + d.min, 0);
     const freedFuel = debts.filter(d => d.balance <= 0).reduce((s, d) => s + d.min, 0);
     let avail = totalMins + extra + freedFuel;
@@ -877,7 +986,60 @@ function estimatePerDebt() {
       t2.balance -= p2; avail -= p2;
       if (t2.balance < 0.005) t2.balance = 0;
     }
-    // Record any debt that died this month
+  }
+  return { months, totalInterest, success: debts.every(d => d.balance <= 0) };
+}
+
+function estimatePerDebt() {
+  const debts = state.debts.map(d => ({
+    id: d.id, name: d.name,
+    balance: Number(d.balance) || 0,
+    apr: Number(d.apr) || 0,
+    min: Number(d.min) || 0
+  }));
+  const extra = Number(state.extraAttack) || 0;
+  const payoffMonth = {};
+  const MAX_MONTHS = 1200;
+  let months = 0;
+  while (debts.some(d => d.balance > 0) && months < MAX_MONTHS) {
+    months++;
+    debts.forEach(d => {
+      if (d.balance > 0) d.balance += d.balance * (d.apr / 100 / 12);
+    });
+    const active = debts.filter(d => d.balance > 0);
+    if (state.strategy === 'avalanche') active.sort((a, b) => b.apr - a.apr);
+    else if (state.strategy === 'snowball') active.sort((a, b) => a.balance - b.balance);
+    else {
+      const orderMap = new Map(state.debts.map((d, i) => [d.id, d.order ?? i]));
+      active.sort((a, b) => (orderMap.get(a.id) ?? 999) - (orderMap.get(b.id) ?? 999));
+    }
+    const target = active[0];
+    if (!target) break;
+    const totalMins = active.reduce((s, d) => s + d.min, 0);
+    const freedFuel = debts.filter(d => d.balance <= 0).reduce((s, d) => s + d.min, 0);
+    let avail = totalMins + extra + freedFuel;
+    for (const d of active) {
+      if (d.id === target.id) continue;
+      const pay = Math.min(d.min, d.balance);
+      d.balance -= pay; avail -= pay;
+    }
+    const pay = Math.min(avail, target.balance);
+    target.balance -= pay; avail -= pay;
+    if (target.balance < 0.005) target.balance = 0;
+    while (avail > 0.01) {
+      const na = debts.filter(d => d.balance > 0);
+      if (!na.length) break;
+      if (state.strategy === 'avalanche') na.sort((a, b) => b.apr - a.apr);
+      else if (state.strategy === 'snowball') na.sort((a, b) => a.balance - b.balance);
+      else {
+        const orderMap = new Map(state.debts.map((d, i) => [d.id, d.order ?? i]));
+        na.sort((a, b) => (orderMap.get(a.id) ?? 999) - (orderMap.get(b.id) ?? 999));
+      }
+      const t2 = na[0];
+      const p2 = Math.min(avail, t2.balance);
+      t2.balance -= p2; avail -= p2;
+      if (t2.balance < 0.005) t2.balance = 0;
+    }
     debts.forEach(d => {
       if (d.balance <= 0 && !(d.id in payoffMonth)) payoffMonth[d.id] = months;
     });
@@ -894,7 +1056,6 @@ function addMonths(dateStr, monthsToAdd) {
 
 /* ----------------- Render ----------------- */
 function render() {
-  // Mission stats
   const totalOriginal = state.debts.reduce((s, d) => s + (Number(d.original) || Number(d.balance) || 0), 0);
   const totalCurrent  = state.debts.reduce((s, d) => s + (Number(d.balance) || 0), 0);
   const activeDebts   = state.debts.filter(d => Number(d.balance) > 0);
@@ -903,11 +1064,34 @@ function render() {
   const snowballFuel   = deadDebts.reduce((s, d) => s + (Number(d.min) || 0), 0);
   const extra          = Number(state.extraAttack) || 0;
   const destroyedPct   = totalOriginal > 0 ? Math.max(0, Math.min(100, ((totalOriginal - totalCurrent) / totalOriginal) * 100)) : 0;
+  const totalPaid      = state.debts.reduce((s, d) =>
+    s + (d.payments || []).reduce((ps, p) => ps + (Number(p.amount) || 0), 0), 0);
 
-  document.getElementById('kpiOriginal').textContent = fmt(totalOriginal);
-  document.getElementById('kpiCurrent').textContent  = fmt(totalCurrent);
-  document.getElementById('kpiMonthly').textContent  = fmt(totalMinActive);
-  document.getElementById('kpiSnowball').textContent = fmt(snowballFuel);
+  // CC utilization
+  const cards = state.debts.filter(d => isCC(d));
+  const ccBalance = cards.reduce((s, d) => s + (Number(d.balance) || 0), 0);
+  const ccLimit   = cards.reduce((s, d) => s + (Number(d.creditLimit) || 0), 0);
+  const utilPct   = ccLimit > 0 ? (ccBalance / ccLimit) * 100 : null;
+
+  document.getElementById('kpiOriginal').textContent  = fmt(totalOriginal);
+  document.getElementById('kpiCurrent').textContent   = fmt(totalCurrent);
+  document.getElementById('kpiPaidTotal').textContent = fmt(totalPaid) + ' paid · ' + fmt(totalOriginal - totalCurrent) + ' total destroyed';
+  document.getElementById('kpiMonthly').textContent   = fmt(totalMinActive);
+  document.getElementById('kpiSnowball').textContent  = fmt(snowballFuel);
+
+  const utilEl = document.getElementById('kpiUtil');
+  const utilSub = document.getElementById('kpiUtilSub');
+  const utilBar = document.getElementById('kpiUtilBar');
+  if (utilPct === null) {
+    utilEl.textContent = '—';
+    utilSub.textContent = 'Set credit limits per card below';
+    utilBar.style.width = '0%';
+  } else {
+    utilEl.textContent = utilPct.toFixed(1) + '%';
+    utilSub.textContent = fmt(ccBalance) + ' of ' + fmt(ccLimit) + ' used';
+    utilBar.style.width = Math.min(100, utilPct) + '%';
+    utilBar.style.background = utilPct > 80 ? 'var(--accent)' : utilPct > 50 ? 'var(--warning)' : 'var(--success)';
+  }
 
   const { ranked } = rankedDebts();
   const target = ranked[0];
@@ -955,16 +1139,14 @@ function render() {
 
   if (visible.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td colspan="13" style="text-align:center; padding: 40px; color: var(--text-muted);">
+    tr.innerHTML = `<td colspan="15" style="text-align:center; padding: 40px; color: var(--text-muted);">
       No debts yet. Click <strong>+ Add New Debt</strong> to start tracking.
     </td>`;
     tbody.appendChild(tr);
   }
 
-  visible.forEach((d, idx) => {
+  visible.forEach((d) => {
     const isTarget = !d._dead && d._rank === 1;
-    const tr = document.createElement('tr');
-    tr.className = d._dead ? 'dead' : (isTarget ? 'target' : '');
     const original = Number(d.original) || Number(d.balance) || 0;
     const balance = Number(d.balance) || 0;
     const progressPct = original > 0 ? Math.max(0, Math.min(100, ((original - balance) / original) * 100)) : (d._dead ? 100 : 0);
@@ -972,7 +1154,22 @@ function render() {
     const autoAttack = isTarget ? (nextTargetMin + extra + snowballFuel) : (Number(d.min) || 0);
     const eta = d._dead ? 'KILLED' : (perDebt[d.id] ? addMonths(state.startDate, perDebt[d.id]) : '—');
 
+    // Per-row utilization
+    let utilHtml = '<span style="color:var(--text-muted);">—</span>';
+    if (isCC(d) && Number(d.creditLimit) > 0) {
+      const u = (balance / d.creditLimit) * 100;
+      const cls = u > 80 ? 'high' : u > 50 ? 'med' : 'low';
+      utilHtml = `<span class="util-pill ${cls}">${u.toFixed(0)}%</span>`;
+    }
+
+    const isExpanded = !!state.expanded[d.id];
+    const balanceDropped = lastBalances[d.id] != null && lastBalances[d.id] > balance;
+
+    const tr = document.createElement('tr');
+    tr.className = d._dead ? 'dead' : (isTarget ? 'target' : '');
+    tr.dataset.id = d.id;
     tr.innerHTML = `
+      <td style="text-align:center;"><button class="btn chev ${isExpanded ? 'open' : ''}" data-toggle="${d.id}" title="${isExpanded ? 'Collapse' : 'Open ledger'}">${isExpanded ? '▾' : '▸'}</button></td>
       <td class="rank">${d._rank}</td>
       <td>${d._dead
         ? '<span class="badge dead-badge">KILLED</span>'
@@ -986,23 +1183,89 @@ function render() {
         </select>
       </td>
       <td><input class="cell-input numeric" type="number" step="0.01" min="0" data-id="${d.id}" data-field="original" value="${Number(d.original) || 0}"></td>
-      <td><input class="cell-input numeric" type="number" step="0.01" min="0" data-id="${d.id}" data-field="balance" value="${Number(d.balance) || 0}"></td>
+      <td class="balance-cell ${balanceDropped ? 'cell-flash' : ''}"><input class="cell-input numeric" type="number" step="0.01" min="0" data-id="${d.id}" data-field="balance" value="${Number(d.balance) || 0}"></td>
+      <td><input class="cell-input numeric" type="number" step="0.01" min="0" data-id="${d.id}" data-field="creditLimit" value="${Number(d.creditLimit) || 0}" ${isCC(d) ? '' : 'placeholder="—"'} ${!isCC(d) ? 'style="opacity:0.4;"' : ''}></td>
+      <td style="text-align:right;">${utilHtml}</td>
       <td><input class="cell-input numeric" type="number" step="0.01" min="0" data-id="${d.id}" data-field="apr" value="${Number(d.apr) || 0}"></td>
       <td><input class="cell-input numeric" type="number" step="0.01" min="0" data-id="${d.id}" data-field="min" value="${Number(d.min) || 0}"></td>
       <td style="text-align:right; font-variant-numeric: tabular-nums;">${fmt(autoAttack)}</td>
-      <td><input class="cell-input numeric" type="number" step="0.01" min="0" data-id="${d.id}" data-field="oneTime" value="${Number(d.oneTime) || 0}"></td>
       <td>
         <div class="row-progress"><div class="row-progress-fill" style="width:${progressPct}%"></div></div>
         <span class="row-progress-label">${progressPct.toFixed(1)}% killed</span>
       </td>
       <td style="white-space:nowrap; color: var(--text-dim);">${eta}</td>
       <td>
-        ${!d._dead ? `<button class="btn tiny success" data-pay="${d.id}" title="Apply one-time hit + mark progress">Apply</button>` : ''}
         <button class="btn tiny danger" data-delete="${d.id}" title="Delete this debt">✕</button>
       </td>
     `;
     tbody.appendChild(tr);
+
+    // Expanded detail row
+    if (isExpanded) {
+      const detailTr = document.createElement('tr');
+      detailTr.className = 'expanded-row';
+      detailTr.innerHTML = `
+        <td colspan="15">
+          <div class="expanded-detail">
+            <div class="expanded-grid">
+              <div class="detail-section">
+                <h4>Account Details</h4>
+                <div class="field-pair">
+                  <label>Credit Limit ${isCC(d) ? '' : '(N/A for non-CC)'}</label>
+                  <input type="number" step="0.01" min="0" value="${Number(d.creditLimit) || 0}" data-detail-id="${d.id}" data-detail-field="creditLimit">
+                </div>
+                <div class="field-pair">
+                  <label>Original Balance (locked in)</label>
+                  <input type="number" step="0.01" min="0" value="${Number(d.original) || 0}" data-detail-id="${d.id}" data-detail-field="original">
+                </div>
+                <div class="field-pair">
+                  <label>Current Balance</label>
+                  <input type="number" step="0.01" min="0" value="${Number(d.balance) || 0}" data-detail-id="${d.id}" data-detail-field="balance">
+                </div>
+                ${isCC(d) && Number(d.creditLimit) > 0 ? `
+                <div style="margin-top:10px; padding:10px; background:var(--bg-2); border-radius:4px;">
+                  <div style="font-size:10px; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Utilization</div>
+                  <div style="font-family:'Impact',sans-serif; font-size:24px; color:var(--gold); margin-top:4px;">${((balance/d.creditLimit)*100).toFixed(1)}%</div>
+                  <div style="font-size:11px; color:var(--text-dim);">${fmt(balance)} of ${fmt(d.creditLimit)}</div>
+                </div>` : ''}
+              </div>
+
+              <div class="detail-section">
+                <h4>Payment Ledger · ${(d.payments || []).length} payment${(d.payments||[]).length===1?'':'s'} logged</h4>
+                <div class="pay-form">
+                  <div class="field">
+                    <label>Date</label>
+                    <input type="date" data-pay-date="${d.id}" value="${todayISO()}">
+                  </div>
+                  <div class="field">
+                    <label>Amount</label>
+                    <input type="number" step="0.01" min="0" data-pay-amount="${d.id}" placeholder="0.00">
+                  </div>
+                  <div class="field">
+                    <label>Note (optional)</label>
+                    <input type="text" data-pay-note="${d.id}" placeholder="e.g. extra paycheck">
+                  </div>
+                  <button class="btn success" data-pay-submit="${d.id}">Log Payment</button>
+                </div>
+                <div class="pay-list">
+                  ${renderPaymentList(d)}
+                </div>
+                ${(d.payments && d.payments.length > 0) ? `
+                  <div class="pay-totals">
+                    <span>Total logged on this debt</span>
+                    <span class="num">${fmt(d.payments.reduce((s, p) => s + (Number(p.amount) || 0), 0))}</span>
+                  </div>` : ''}
+              </div>
+            </div>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(detailTr);
+    }
   });
+
+  // Update balance tracker for next-render flash
+  state.debts.forEach(d => { lastBalances[d.id] = Number(d.balance) || 0; });
 
   // Victory log
   const log = document.getElementById('victoryLog');
@@ -1022,59 +1285,165 @@ function render() {
     });
   }
 
-  // Re-bind inline inputs
-  tbody.querySelectorAll('.cell-input').forEach(el => {
-    el.addEventListener('change', onCellChange);
-  });
-  tbody.querySelectorAll('[data-delete]').forEach(el => el.addEventListener('click', () => deleteDebt(el.dataset.delete)));
-  tbody.querySelectorAll('[data-pay]').forEach(el => el.addEventListener('click', () => applyOneTime(el.dataset.pay)));
-  log.querySelectorAll('[data-removelog]').forEach(el => el.addEventListener('click', () => {
-    state.victoryLog = state.victoryLog.filter(v => v.id !== el.dataset.removelog);
-    saveState(); render();
-  }));
+  // Re-bind handlers
+  bindRowEvents();
+}
+
+function renderPaymentList(debt) {
+  if (!debt.payments || debt.payments.length === 0) {
+    return '<div class="pay-empty">No payments logged yet. Use the form above to log your first hit.</div>';
+  }
+  const sorted = [...debt.payments].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  return sorted.map(p => `
+    <div class="pay-row" data-payrow="${p.id}">
+      <span class="date">${escapeHtml(formatDate(p.date))}</span>
+      <span class="amount" data-edit-amount="${debt.id}" data-pid="${p.id}">${fmt2(p.amount)}</span>
+      <span class="note">${escapeHtml(p.note || '')}</span>
+      <button class="btn tiny" data-edit-payment="${debt.id}" data-pid="${p.id}" title="Edit">✎</button>
+      <button class="btn tiny danger" data-delete-payment="${debt.id}" data-pid="${p.id}" title="Delete">✕</button>
+    </div>
+  `).join('');
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso + 'T00:00:00');
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function escapeAttr(s) { return escapeHtml(s); }
 
-/* ----------------- Edits ----------------- */
+/* ----------------- Event bindings ----------------- */
+function bindRowEvents() {
+  const tbody = document.getElementById('debtBody');
+
+  tbody.querySelectorAll('.cell-input').forEach(el => el.addEventListener('change', onCellChange));
+  tbody.querySelectorAll('[data-detail-id]').forEach(el => el.addEventListener('change', onDetailChange));
+  tbody.querySelectorAll('[data-toggle]').forEach(el => el.addEventListener('click', () => toggleExpand(el.dataset.toggle)));
+  tbody.querySelectorAll('[data-delete]').forEach(el => el.addEventListener('click', () => deleteDebt(el.dataset.delete)));
+  tbody.querySelectorAll('[data-pay-submit]').forEach(el => el.addEventListener('click', () => logPayment(el.dataset.paySubmit)));
+  tbody.querySelectorAll('[data-edit-payment]').forEach(el => el.addEventListener('click', () => editPayment(el.dataset.editPayment, el.dataset.pid)));
+  tbody.querySelectorAll('[data-delete-payment]').forEach(el => el.addEventListener('click', () => deletePayment(el.dataset.deletePayment, el.dataset.pid)));
+
+  document.querySelectorAll('[data-removelog]').forEach(el => el.addEventListener('click', () => {
+    state.victoryLog = state.victoryLog.filter(v => v.id !== el.dataset.removelog);
+    saveState(); render();
+  }));
+}
+
+/* ----------------- Cell edits ----------------- */
 function onCellChange(e) {
   const id = e.target.dataset.id;
   const field = e.target.dataset.field;
   const debt = state.debts.find(d => d.id === id);
   if (!debt) return;
   let val = e.target.value;
-  if (['original','balance','apr','min','oneTime'].includes(field)) {
+  if (['original','balance','apr','min','creditLimit'].includes(field)) {
     val = Number(val) || 0;
   }
   const wasAlive = Number(debt.balance) > 0;
   debt[field] = val;
-
-  // If original wasn't set, infer it from balance the first time
-  if (field === 'balance' && (!debt.original || debt.original === 0)) {
-    debt.original = val;
-  }
-
-  // Detect a fresh kill
+  if (field === 'balance' && (!debt.original || debt.original === 0)) debt.original = val;
   const isDead = Number(debt.balance) <= 0;
   if (wasAlive && isDead) logVictory(debt);
-
   saveState();
   render();
 }
 
-function applyOneTime(id) {
+function onDetailChange(e) {
+  const id = e.target.dataset.detailId;
+  const field = e.target.dataset.detailField;
   const debt = state.debts.find(d => d.id === id);
   if (!debt) return;
-  const hit = Number(debt.oneTime) || 0;
-  if (hit <= 0) { toast('Set a one-time hit amount first.'); return; }
+  let val = e.target.value;
+  if (['original','balance','apr','min','creditLimit'].includes(field)) val = Number(val) || 0;
   const wasAlive = Number(debt.balance) > 0;
-  debt.balance = Math.max(0, (Number(debt.balance) || 0) - hit);
-  debt.oneTime = 0;
-  if (wasAlive && Number(debt.balance) <= 0) logVictory(debt);
+  debt[field] = val;
+  const isDead = Number(debt.balance) <= 0;
+  if (field === 'balance' && wasAlive && isDead) logVictory(debt);
   saveState();
   render();
-  toast('Applied ' + fmt(hit) + ' to ' + debt.name, 'success');
+}
+
+/* ----------------- Payment ops ----------------- */
+function logPayment(debtId) {
+  const debt = state.debts.find(d => d.id === debtId);
+  if (!debt) return;
+  const dateEl   = document.querySelector(`[data-pay-date="${debtId}"]`);
+  const amountEl = document.querySelector(`[data-pay-amount="${debtId}"]`);
+  const noteEl   = document.querySelector(`[data-pay-note="${debtId}"]`);
+  const amount = Number(amountEl.value) || 0;
+  if (amount <= 0) { toast('Enter a payment amount greater than zero.'); amountEl.focus(); return; }
+  const date = dateEl.value || todayISO();
+  const note = noteEl.value || '';
+
+  debt.payments = debt.payments || [];
+  debt.payments.push({
+    id: 'p_' + Math.random().toString(36).slice(2, 9),
+    date, amount, note
+  });
+  const wasAlive = Number(debt.balance) > 0;
+  debt.balance = Math.max(0, (Number(debt.balance) || 0) - amount);
+  if (wasAlive && debt.balance <= 0) logVictory(debt);
+
+  saveState();
+  render();
+
+  // Find the now-rendered balance cell and pop the flash + toast
+  setTimeout(() => {
+    const cell = document.querySelector(`tr[data-id="${debtId}"] .balance-cell`);
+    if (cell) {
+      cell.classList.remove('cell-flash');
+      void cell.offsetWidth;
+      cell.classList.add('cell-flash');
+    }
+  }, 40);
+  toast('💥 ' + fmt(amount) + ' applied to ' + debt.name + ' · New balance: ' + fmt(debt.balance), 'success');
+}
+
+function editPayment(debtId, pid) {
+  const debt = state.debts.find(d => d.id === debtId);
+  if (!debt) return;
+  const p = (debt.payments || []).find(x => x.id === pid);
+  if (!p) return;
+  const newAmt = prompt('Edit payment amount:', p.amount);
+  if (newAmt === null) return;
+  const newDate = prompt('Edit payment date (YYYY-MM-DD):', p.date);
+  if (newDate === null) return;
+  const newNote = prompt('Edit note (optional):', p.note || '');
+  if (newNote === null) return;
+  const delta = (Number(newAmt) || 0) - (Number(p.amount) || 0);
+  p.amount = Number(newAmt) || 0;
+  p.date = newDate || p.date;
+  p.note = newNote;
+  // Adjust balance by delta (more paid → balance drops; less paid → balance rises)
+  debt.balance = Math.max(0, (Number(debt.balance) || 0) - delta);
+  saveState();
+  render();
+  toast('Payment updated · balance adjusted by ' + fmt(-delta), 'success');
+}
+
+function deletePayment(debtId, pid) {
+  const debt = state.debts.find(d => d.id === debtId);
+  if (!debt) return;
+  const p = (debt.payments || []).find(x => x.id === pid);
+  if (!p) return;
+  if (!confirm('Delete this ' + fmt(p.amount) + ' payment? The balance will be restored.')) return;
+  debt.payments = debt.payments.filter(x => x.id !== pid);
+  debt.balance = (Number(debt.balance) || 0) + (Number(p.amount) || 0);
+  saveState();
+  render();
+  toast('Payment removed · balance restored by ' + fmt(p.amount));
+}
+
+/* ----------------- Other ops ----------------- */
+function toggleExpand(id) {
+  state.expanded = state.expanded || {};
+  state.expanded[id] = !state.expanded[id];
+  saveState();
+  render();
 }
 
 function logVictory(debt) {
@@ -1093,6 +1462,7 @@ function deleteDebt(id) {
   if (!debt) return;
   if (!confirm('Delete "' + (debt.name || 'this debt') + '"? This cannot be undone (but your JSON backup will still have it).')) return;
   state.debts = state.debts.filter(d => d.id !== id);
+  if (state.expanded) delete state.expanded[id];
   saveState();
   render();
   toast('Deleted ' + (debt.name || 'debt'));
@@ -1108,6 +1478,8 @@ function addDebt(payload) {
     apr: Number(payload.apr) || 0,
     min: Number(payload.min) || 0,
     oneTime: 0,
+    creditLimit: Number(payload.creditLimit) || 0,
+    payments: [],
     order: state.debts.length
   };
   state.debts.push(debt);
@@ -1139,6 +1511,20 @@ function importJson(file) {
       if (!parsed || !Array.isArray(parsed.debts)) throw new Error('Invalid file: missing debts array');
       if (!confirm('Replace current data with the contents of this file?')) return;
       state = { ...structuredClone(DEFAULT_STATE), ...parsed };
+      // Re-migrate to ensure schema fields exist
+      state.debts = state.debts.map(d => ({
+        id: d.id || uid(),
+        name: d.name || '',
+        type: d.type || 'Credit Card',
+        original: Number(d.original) || Number(d.balance) || 0,
+        balance: Number(d.balance) || 0,
+        apr: Number(d.apr) || 0,
+        min: Number(d.min) || 0,
+        oneTime: Number(d.oneTime) || 0,
+        creditLimit: Number(d.creditLimit) || 0,
+        payments: Array.isArray(d.payments) ? d.payments : [],
+        order: typeof d.order === 'number' ? d.order : 0
+      }));
       saveState();
       hydrateInputs();
       render();
@@ -1151,7 +1537,7 @@ function importJson(file) {
 }
 
 function resetAll() {
-  if (!confirm('This will WIPE all debts and victory log entries. Are you sure?')) return;
+  if (!confirm('This will WIPE all debts, payments, and victory log entries. Are you sure?')) return;
   if (!confirm('Last chance. Really wipe everything?')) return;
   state = structuredClone(DEFAULT_STATE);
   saveState();
@@ -1197,6 +1583,7 @@ function init() {
       name: document.getElementById('newName').value.trim(),
       type: document.getElementById('newType').value,
       balance: Number(document.getElementById('newBalance').value) || 0,
+      creditLimit: Number(document.getElementById('newLimit').value) || 0,
       apr: Number(document.getElementById('newApr').value) || 0,
       min: Number(document.getElementById('newMin').value) || 0
     };
@@ -1205,6 +1592,7 @@ function init() {
     addDebt(payload);
     document.getElementById('newName').value = '';
     document.getElementById('newBalance').value = '';
+    document.getElementById('newLimit').value = '';
     document.getElementById('newApr').value = '';
     document.getElementById('newMin').value = '';
   });
@@ -1218,11 +1606,10 @@ function init() {
   });
   document.getElementById('resetBtn').addEventListener('click', resetAll);
 
-  // Set saved indicator
   const dot = document.getElementById('saveDot');
   const txt = document.getElementById('saveText');
   dot.classList.remove('saving');
-  txt.textContent = state.debts.length ? 'Auto-saved' : 'Ready';
+  txt.textContent = state.debts.length ? 'Auto-saved · ' + state.debts.length + ' debt' + (state.debts.length===1?'':'s') + ' loaded' : 'Ready';
 }
 
 init();
